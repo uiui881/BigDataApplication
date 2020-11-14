@@ -1,0 +1,10 @@
+drop table rate;
+drop table customer;
+drop table opening_cost;
+drop table current_situation;
+drop table profitability;
+drop table stability;
+drop table sex;
+drop table brand;
+drop table company;
+drop table age;

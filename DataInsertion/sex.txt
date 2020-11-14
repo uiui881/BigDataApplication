@@ -1,0 +1,2 @@
+insert into sex(sex_id, sex_name) values(1, "Female" );
+insert into sex(sex_id, sex_name) values(2, "Male" );
