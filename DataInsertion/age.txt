@@ -1,7 +1,0 @@
-insert into age(age_id, age) values(1, "10s");
-insert into age(age_id, age) values(2, "20s");
-insert into age(age_id, age) values(3, "30s");
-insert into age(age_id, age) values(4, "40s");
-insert into age(age_id, age) values(5, "50s");
-insert into age(age_id, age) values(6, "60s");
-insert into age(age_id, age) values(7, "over 70");
