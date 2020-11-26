@@ -1,0 +1,697 @@
+use team06;
+
+
+drop table rate;
+drop table customer;
+drop table opening_cost;
+drop table current_situation;
+drop table profitability;
+drop table stability;
+drop table sex;
+drop table brand;
+drop table company;
+drop table age;
+
+drop view franchisesNumSum;
+
+use team06;
+
+create table age ( 
+    age_id int,
+    age varchar(10) not null,
+    PRIMARY KEY(age_id)
+);
+
+create table company( 
+	company_id int,
+	company_name varchar(30) not null,
+	PRIMARY KEY(company_id)
+);
+create table brand(
+    brand_id int,
+    brand_name varchar(50) not null,
+    company_id int,  
+    PRIMARY KEY(brand_id),
+    FOREIGN KEY(company_id) REFERENCES company(company_id) on DELETE CASCADE
+);
+
+create table sex(
+     sex_id int,
+     sex_name varchar(10) not null,
+     PRIMARY KEY(sex_id)
+);
+
+
+create table stability(
+        company_id int,
+        yr int, 
+        capital double, 
+        debt double, 
+        dept_ratio int ,
+        equity_capital_ratio int,
+        violation_of_the_law int,
+        PRIMARY KEY(company_id, yr),
+	FOREIGN KEY(company_id) REFERENCES company(company_id) on DELETE CASCADE
+);
+
+
+
+
+create table profitability(
+        company_id int,
+        yr int, 
+        asset int,
+        sales int, 
+        operatingprofit int,
+        totalassetgrowthrate float, 
+        salesgrowthrate float, 
+        operatingprofitgrowthrate varchar(10) not null,
+        PRIMARY KEY(company_id, yr),
+	FOREIGN KEY(company_id) REFERENCES company(company_id) on DELETE CASCADE
+);
+
+
+create table current_situation(
+        brand_id int,
+        opening_date Date not null,
+        NumberOfFranchises int,
+        NumberOfEmployees int not null,
+        Scheduled_To_Open int,
+        Scheduled_To_Close int,
+        Contract_Termination int,
+        Transfer int,
+        AverageSales int,
+        Average_Sales_per_Area int,
+        PRIMARY KEY(brand_id),
+        FOREIGN KEY(brand_id) REFERENCES brand(brand_id) on DELETE CASCADE
+);
+
+create table opening_cost( 
+        brand_id int,
+        subscript_fee int,
+        education_fee int,
+        deposit_fee int,
+        extra_fee int,
+        cost_per_area int,
+        standard_area float,
+        PRIMARY KEY(brand_id),
+	FOREIGN KEY(brand_id) REFERENCES brand(brand_id) on DELETE CASCADE
+);
+
+
+create table customer(
+        customer_id int,
+        sex_id int,
+        age_id int,
+        nickname  varchar(30) not null,
+        password varchar(30) not null,
+        PRIMARY KEY(customer_id),
+        FOREIGN KEY(sex_id) REFERENCES sex(sex_id) on DELETE CASCADE,
+        FOREIGN KEY(age_id) REFERENCES age(age_id) on DELETE CASCADE
+);
+
+create table rate(
+        customer_id int,
+        brand_id int,
+        staff_service int, 
+        accessibility int,
+        convenience int,
+        taste_menu int,
+        price int,
+        additional_service int,
+        service_favorability int,
+        PRIMARY KEY(customer_id,brand_id),
+        FOREIGN KEY(customer_id) REFERENCES customer(customer_id) on DELETE CASCADE,
+ FOREIGN KEY(brand_id) REFERENCES brand(brand_id) on DELETE CASCADE	
+);
+
+create view franchisesNumSum as
+select brand.company_id, sum(current_situation.NumberOfFranchises), ntile(5) over(order by sum(current_situation.NumberOfFranchises) asc)
+FROM brand, current_situation where brand.brand_id = current_situation.brand_id 
+group by brand.company_id
+order by brand.company_id;
+
+create index customer_nickname_index on customer(nickname);
+
+use team06;
+
+insert into age(age_id, age) values(1, "10s");
+insert into age(age_id, age) values(2, "20s");
+insert into age(age_id, age) values(3, "30s");
+insert into age(age_id, age) values(4, "40s");
+insert into age(age_id, age) values(5, "50s");
+insert into age(age_id, age) values(6, "60s");
+insert into age(age_id, age) values(7, "over 70");
+
+insert into company(company_id, company_name) values(1, "·Ôµ¥Áö¾Ë¿¡½º(ÁÖ)" );
+insert into company(company_id, company_name) values(2, "(ÁÖ)ÀÌ·£µåÆÄÅ©" );
+insert into company(company_id, company_name) values(3, "(ÁÖ)ÀÌµð¾ß" );
+insert into company(company_id, company_name) values(4, "(ÁÖ)´õº»ÄÚ¸®¾Æ" );
+insert into company(company_id, company_name) values(5, "(ÁÖ)Å½¾ØÅ½½º" );
+insert into company(company_id, company_name) values(6, "(ÁÖ)´õº¥Æ¼ÄÚ¸®¾Æ" );
+insert into company(company_id, company_name) values(7, "(ÁÖ)´ÞÄÞ" );
+insert into company(company_id, company_name) values(8, "(ÁÖ)¼¼ÄÁµåÂù½º" );
+insert into company(company_id, company_name) values(9, "(ÁÖ)Ä¿ÇÇ¿¡¹ÝÇÏ´Ù" );
+insert into company(company_id, company_name) values(10, "(ÁÖ)¸Æ½º¿øÀÌ¸µÅ©" );
+insert into company(company_id, company_name) values(11, "(ÁÖ)¾ØÇÏ¿ì½º" );
+insert into company(company_id, company_name) values(12, "(ÁÖ)¸Å¸ÓµåÄ¿ÇÇ·¦" );
+insert into company(company_id, company_name) values(13, "(ÁÖ)Ä«Æäº½º½" );
+insert into company(company_id, company_name) values(14, "(ÁÖ)¿¡½º¾ØÅ¥ÇÃ·¯½º" );
+insert into company(company_id, company_name) values(15, "(ÁÖ)Á¦ÀÌ¿¥Ä¿ÇÇÄÄÆÛ´Ï" );
+insert into company(company_id, company_name) values(16, "(ÁÖ)´ÙºóÄ¡" );
+insert into company(company_id, company_name) values(17, "(ÁÖ)Ä¿ÇÇ¸¸ÄÄÆÛ´Ï" );
+insert into company(company_id, company_name) values(18, "(ÁÖ)ºñºê¶ó´õ½º" );
+insert into company(company_id, company_name) values(19, "(ÁÖ)·ç¾Øºñ" );
+insert into company(company_id, company_name) values(20, "(ÁÖ)Ä«Æä¿øÇÃ·¯½º¿ø" );
+insert into company(company_id, company_name) values(21, "(ÁÖ)ºñÄÉÀÌÄÄÆÛ´Ï" );
+insert into company(company_id, company_name) values(22, "(ÁÖ)ÆÄ¸®Å©¶ó»ó" );
+insert into company(company_id, company_name) values(23, "(ÁÖ)ÈñÃµ" );
+insert into company(company_id, company_name) values(24, "(ÁÖ)Ä¿ÇÇº£ÀÌ" );
+insert into company(company_id, company_name) values(25, "Åõ½æÇÃ·¹ÀÌ½º¢ß" );
+insert into company(company_id, company_name) values(26, "¢ßº£¸ð½º" );
+
+insert into brand(brand_id, brand_name, company_id) values(1, "ÀÌµð¾ßÄ¿ÇÇ", 3);
+insert into brand(brand_id, brand_name, company_id) values(2, "Åõ½æÇÃ·¹ÀÌ½º", 25);
+insert into brand(brand_id, brand_name, company_id) values(3, "¸Þ°¡¿¥Áö¾¾Ä¿ÇÇ(MEGA MGC COFFEE)", 11);
+insert into brand(brand_id, brand_name, company_id) values(4, "Ä¿ÇÇ¿¡¹ÝÇÏ´Ù", 9);
+insert into brand(brand_id, brand_name, company_id) values(5, "»ª´Ù¹æ", 4);
+insert into brand(brand_id, brand_name, company_id) values(6, "Ä¿ÇÇº£ÀÌ", 24);
+insert into brand(brand_id, brand_name, company_id) values(7, "¿£Á¦¸®³Ê½º", 1);
+insert into brand(brand_id, brand_name, company_id) values(8, "ÆÄ½ºÄíÂî", 22);
+insert into brand(brand_id, brand_name, company_id) values(9, "ÄÄÆ÷ÁîÄ¿ÇÇ(COMPOSE COFFEE)", 15);
+insert into brand(brand_id, brand_name, company_id) values(10, "´õº¥Æ¼", 6);
+insert into brand(brand_id, brand_name, company_id) values(11, "Å½¾ØÅ½½ºÄ¿ÇÇ(TOMNTOMS COFFEE)", 5);
+insert into brand(brand_id, brand_name, company_id) values(12, "¼¿·ºÅäÄ¿ÇÇ", 10);
+insert into brand(brand_id, brand_name, company_id) values(13, "ÅäÇÁ·¹¼Ò", 14);
+insert into brand(brand_id, brand_name, company_id) values(14, "´õ¸®ÅÍ(THE LITER)", 23);
+insert into brand(brand_id, brand_name, company_id) values(15, "º½º½Å×ÀÌÅ©¾Æ¿ô(º½º½TAKE-OUT)", 13);
+insert into brand(brand_id, brand_name, company_id) values(16, "´õÄ«Æä", 2);
+insert into brand(brand_id, brand_name, company_id) values(17, "°¨¼ºÄ¿ÇÇ", 18);
+insert into brand(brand_id, brand_name, company_id) values(18, "¿¢¼Ò¿¢¼ÒÇÖµµ±×¾ØÄ¿ÇÇ", 8);
+insert into brand(brand_id, brand_name, company_id) values(19, "´ÞÄÞ", 7);
+insert into brand(brand_id, brand_name, company_id) values(20, "¾Æ¸¶½ººó", 21);
+insert into brand(brand_id, brand_name, company_id) values(21, "Ä¿ÇÇ¿Â¸®", 17);
+insert into brand(brand_id, brand_name, company_id) values(22, "Ä«Æä¶ì¾Æ¸ð", 26);
+insert into brand(brand_id, brand_name, company_id) values(23, "¸Å¸ÓµåÀÍ½ºÇÁ·¹½º(Mammoth Express)", 12);
+insert into brand(brand_id, brand_name, company_id) values(24, "Ä«Æä·ç¾Øºñ", 19);
+insert into brand(brand_id, brand_name, company_id) values(25, "¸Å¸ÓµåÄ¿ÇÇ(Mammoth coffee)", 12);
+insert into brand(brand_id, brand_name, company_id) values(26, "Ä«Æä¿øÇÃ·¯½º¿ø", 20);
+insert into brand(brand_id, brand_name, company_id) values(27, "´ÙºóÄ¡Ä¿ÇÇ", 16);
+insert into brand(brand_id, brand_name, company_id) values(28, "1LiTER COFFEE", 20);
+insert into brand(brand_id, brand_name, company_id) values(29, "·ç°í", 2);
+insert into brand(brand_id, brand_name, company_id) values(30, "Ä«Æä´ÙºóÄ¡", 16);
+
+insert into sex(sex_id, sex_name) values(1, "Female" );
+insert into sex(sex_id, sex_name) values(2, "Male" );
+
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(1, 2018, 578048000, 547465000, 0.9471, 0.5136, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(2, 2018, 175868405, 592969055, 3.3717, 0.2287, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(3, 2018, 50092874, 55249233, 1.1029, 0.4755, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(4, 2018, 49659143, 35339190, 0.7116, 0.5842, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(5, 2018, 23491441, 46493234, 1.9792, 0.3357, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(6, 2018, 4733458, 10251334, 2.1657, 0.3159, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(7, 2018, 3669342, 1125647, 0.3068, 0.7652, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(8, 2018, 3355601, 2641636, 0.7872, 0.5595, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(9, 2018, 3148129, 2400584, 0.7625, 0.5674, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(10, 2018, 3102003, 3714337, 1.1974, 0.4551, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(11, 2018, 1579223, 5446475, 3.4488, 0.2248, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(12, 2018, 1495035, 3621735, 2.4225, 0.2922, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(13, 2018, 1367038, 889859, 0.6509, 1, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(14, 2018, 1266510, 1498670, 1.1833, 0.458, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(15, 2018, 1253067, 938855, 0.7492, 0.5717, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(16, 2018, 780067, 2495438, 3.199, 0.2382, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(17, 2018, 588941, 2493414, 4.2337, 0.1911, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(18, 2018, 511353, 913225, 1.7859, 0.359, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(19, 2018, 380916, 1207765, 3.1707, 0.2398, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(20, 2018, 354255, 472097, 1.3326, 0.4287, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(21, 2018, 70284, 69242, 0.9852, 0.5037, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(22, 2018, 682859078, 626083995, 0.9169, 0.5217, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(23, 2018, null, null, null, null , null); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(24, 2018, null, null, null, null , null); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(25, 2018, null, null, null, null , null ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(26, 2018, null, null, null, null , null ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(22, 2019, 2108110, 2598910, 1.2328, 0.4479, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(1, 2019, 4002633, 20470151, 5.1142, 0.1636, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(25, 2019, 2044109, 4012963, 1.9632, 0.3375, 1 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(3, 2019, 56264314, 33465620, 0.5948, 0.627, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(4, 2019, 197121, 1486418, 7.5406, 0.1171, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(5, 2019, 746239, 2957353, 3.963, 0.2015, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(8, 2019, 1582901, 2720315, 1.7186, 0.3678, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(6, 2019, 777585, 1038422, 1.3354, 0.4282, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(24, 2019, 533987, 331937, 0.6216, 0.6167, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(7, 2019, 2224869, 10414057, 4.6808, 0.176, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(11, 2019, 7252736, 2663590, 0.3673, 0.7314, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(9, 2019, 1380098, 989032, 0.7166, 0.5825, 0  ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(12, 2019, 57150318, 51605822, 0.903, 0.5255, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(10, 2019, 2266194, 1407147, 0.6209, 0.6169, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(26, 2019, 492517, 821488, 1.6679, 0.3748, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(15, 2019, 3327347, 7848734, 2.3589, 0.2977, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(14, 2019, 3050411, 6860138, 2.2489, 0.3078, 1 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(18, 2019, 41600066, 79389585, 1.9084, 0.3438, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(16, 2019, 735476027, 745981138, 1.0143, 0.4965, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(17, 2019, 482500000, 247551000, 0.5131, 0.6609, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(19, 2019, 83302119, 93115706, 1.1178, 0.4722, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(21, 2019, 567388, 544196, 0.9591, 0.5104, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(20, 2019, 2185030, 4333996, 1.9835, 0.3352, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(2, 2019, null, null, null, null, null ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(13, 2019, null, null, null, null, null ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(23, 2019, null, null, null, null, null ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(22, 2020, 738060841, 872091172, 1.1816, 0.4584, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(1, 2020, 254796000, 562611000, 2.2081, 0.3117, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(25, 2020, 107194667, 90271671, 0.8421, 0.5429, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(2, 2020, 86821128, 189350522, 2.1809, 0.3144, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(3, 2020, 69955817, 54905089, 0.7849, 0.5603, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(5, 2020, 64298814, 44715637, 0.6954, 0.5898, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(4, 2020, 36602807, 76070377, 2.0783, 0.3249, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(7, 2020, 18171588, 6152297, 0.3386, 0.7471, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(11, 2020, 4322537, 5882172, 1.3608, 0.4236, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(24, 2020, 4252361, 3097601, 0.7284, 0.5786, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(9, 2020, 4188573, 5436793, 1.298, 0.4352, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(8, 2020, 3940705, 6407467, 1.626, 0.3808, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(6, 2020, 3593783, 7860715, 2.1873, 0.3137, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(15, 2020, 2160496, 2169818, 1.0043, 0.4989, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(13, 2020, 2152528, 3429685, 1.5933, 0.3856, 0  ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(26, 2020, 1754738, 4383454, 2.4981, 0.2859, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(10, 2020, 1655954, 3224591, 1.9473, 0.3393, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(23, 2020, 1390270, 1208460, 0.8692, 0.535, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(12, 2020, 1377443, 2987687, 2.169, 0.3156, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(16, 2020, 852886, 5393305, 6.3236, 0.1365, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(18, 2020, 697071, 787048, 1.1291, 0.4697, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(14, 2020, 505394, 829966, 1.6422, 0.3785, 1 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(21, 2020, 448012, 454797, 1.0151, 0.4962, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(20, 2020, 414816, 1790537, 4.3165, 0.1881, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(19, 2020, 97789, 1120824, 11.4617, 0.0802, 0 ); 
+insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_ratio, violation_of_the_law) values(17, 2020, -2178837, 28151020, null, null , 0); 
+
+
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(1, 2018, 1125513000, 907066000, 3162000, -0.0144, -0.0441, "-0.8359" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(2, 2018, 768837460, 682431869, -17735589, -0.1243, -0.1527, "ÀûÀÚÁö¼Ó" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(3, 2018, 105342107, 184124914, 20199892, 0.1986, 0.1992, "0.2797" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(4, 2018, 84998333, 174084567, 12807635, 0.193, -0.0045, "-0.3519" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(5, 2018, 69984675, 82387074, 4117088, 0.0223, -0.052, "0.7435" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(6, 2018, 6816340, 23739823, 1001943, 0.2217, 0.1052, "-0.6582" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(7, 2018, 14984792, 20048468, 574013, 0.8733, 0.1852, "0.0659" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(8, 2018, 3275505, 16029612, 227824, 1.7249, 2.8543, "0.2077" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(9, 2018, 7025698, 11805944, 470830, 0.1194, -0.0226, "-0.1698" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(10, 2018, 5116770, 11583379, 128497, 0.0314, -0.1139, "-0.1005" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(11, 2018, 4794989, 10633490, 3158511, 4.7759, 3.014, "19.5863" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(12, 2018, 3082355, 8444227, 363833, 0.8671, 0.0758, "0.1549" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(13, 2018, 5548713, 7429420, 1589540, 1.2666, 0.5659, "0.4546" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(14, 2018, 2303810, 6381871, 48645, 0.0566, -0.0323, "2.6337" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(15, 2018, 2765180, 5439159, 815352, 0.7816, 0.109, "0.8122" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2018, 5997237, 4130907, -95558, -0.0683, -0.1557, "ÀûÀÚÀüÈ¯" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(17, 2018, 826352, 3729685, 137565, 0.761, 1.8501, "0.2312" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(18, 2018, 1424578, 3051621, 162581, 0.4413, 0.0986, "1.6965" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2018, 1588681, 2816819, -102893, 0.1363, -0.2913, "ÀûÀÚÀüÈ¯" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(20, 2018, 1367038, 1469709, 107514, -0.1249, -0.2562, "-0.3259" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(21, 2018, 139526, 348056, 109956, 0.7033, 1.3392, "ÈæÀÚÀüÈ¯" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(22, 2018, 1308943073, 1774316302, 43545110, 0.0837, -0.0016, "-0.3449" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(23, 2018, 0, 0, 0, 0, 0, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(24, 2018, 0, 0, 0, 0, 0, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(25, 2018, 0, 0, 0, 0, 0, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(26, 2018, 0, 0, 0, 0, 0, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(22, 2019, 1481457165, 1777641696, 55894964, 0.1318, 0.0019, "0.2836" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(1, 2019, 730051000, 831073000, 6535000, -0.3514, -0.0838, "1.0667" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(25, 2019, 176417825, 268709772, 32642070, null, null, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(3, 2019, 108756140, 200463915, 17648873, 0.0324, 0.0887, "-0.1263" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(4, 2019, 89729934, 177629625, 10198075, 0.0557, 0.0204, "-0.2038" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(5, 2019, 120989651, 74025294, 2522277, 0.7288, -0.1015, "-0.3874" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(8, 2019, 12638926, 33672543, 540683, 2.8586, 1.1006, "1.3732" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(6, 2019, 6057072, 28460703, 1730089, -0.1114, 0.1989, "0.7267" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(24, 2019, 11176081, 23193160, 2560472, 0.0541, 0.2026, "1.6455" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(7, 2019, 24472784, 18540778, -3538898, 0.6332, -0.0752, "ÀûÀÚÀüÈ¯" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(11, 2019, 9916326, 16325621, 7645810, 1.0681, 0.5353, "1.4207" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(9, 2019, 9910549, 14001142, 743902, 0.4106, 0.1859, "0.58" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(12, 2019, 3703592, 10974574, 225907, 0.2015, 0.2997, "-0.3791" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(10, 2019, 4303216, 10348862, 165307, -0.159, -0.1066, "0.2865" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(26, 2019, 6519026, 6871510, 131435, -0.0099, -0.2542, "-0.0704" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(15, 2019, 3673341, 6516524, 1127362, 0.3284, 0.1981, "0.3827" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(14, 2019, 2316013, 6313827, 31686, 0.0053, -0.0107, "-0.3486" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(18, 2019, 1816007, 4593151, 314880, 0.2748, 0.5052, "0.9368" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2019, 4707020, 2874618, -110234, -0.2151, -0.3041, "ÀûÀÚÁö¼Ó" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(17, 2019, 1111584, 1830443, 240656, 0.3452, -0.5092, "0.7494" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2019, 1683539, 1616632, -164240, 0.0597, -0.4261, "ÀûÀÚÁö¼Ó" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(21, 2019, 865924, 1291909, 461346, 5.2062, 2.7118, "3.1957" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(20, 2019, 1314005, 1218644, 33058, -0.0388, -0.1708, "-0.6925" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(2, 2019, 0, 0, 0, 0, 0, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(13, 2019, 0, 0, 0, 0, 0, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(23, 2019, 0, 0, 0, 0, 0, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(22, 2020, 1610152013, 1835110668, 76071852, 0.0869, 0.0323, "0.361" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(1, 2020, 817407000, 839892000, 21327000, 0.1197, 0.0106, "2.2635" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(25, 2020, 276171650, 328893259, 38658024, 0.5654, 0.224, "0.1843" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(2, 2020, 197466338, 236253184, 6344618, null, null, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(3, 2020, 124860906, 220779522, 19447929, 0.1481, 0.1013, "0.1019" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(5, 2020, 112673184, 68366316, 1702204, -0.0687, -0.0764, "-0.3251" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(4, 2020, 109014451, 120090805, 11268245, 0.2149, -0.3239, "0.1049" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(7, 2020, 25972183, 19186823, -3854347, 0.0613, 0.0348, "ÀûÀÚÁö¼Ó" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(11, 2020, 24323885, 35019820, 18328333, 1.4529, 1.1451, "1.3972" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(24, 2020, 11454498, 26830016, 2932592, 0.0249, 0.1568, "0.1453" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(9, 2020, 10348172, 17200767, 911241, 0.0442, 0.2285, "0.2249" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(8, 2020, 10204709, 32283951, 660875, -0.1926, -0.0412, "0.2223" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(6, 2020, 9625366, 37129652, 2812817, 0.5891, 0.3046, "0.6258" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(15, 2020, 7349962, 12769577, 2420029, 1.0009, 0.9596, "1.1466" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(13, 2020, 6246191, 10164661, 1090127, null, null, "null" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(26, 2020, 6138192, 4720407, -289947, -0.0584, -0.313, "ÀûÀÚÀüÈ¯" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(10, 2020, 5582213, 10668585, 226317, 0.2721, 0.0309, "0.3691" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(23, 2020, 4880545, 22604248, 1725451, 0.5216, 0.0725, "1.1979" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(12, 2020, 4365130, 13262117, 370381, 0.1786, 0.2084, "0.6395" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2020, 4330314, 2665859, -129587, -0.08, -0.0726, "ÀûÀÚÁö¼Ó" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(18, 2020, 2598730, 5421380, 811974, 0.431, 0.1803, "1.5787" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(14, 2020, 2205353, 5601859, 2505, -0.0478, -0.1128, "-0.9209" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(21, 2020, 1484119, 1925058, 247871, 0.7139, 0.4901, "-0.4627" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(20, 2020, 1335360, 1056939, 18380, 0.0163, -0.1327, "-0.444" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2020, 1218613, 888758, -86635, -0.2762, -0.4502, "ÀûÀÚÁö¼Ó" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(17, 2020, 902809, 1902106, -110454, -0.1878, 0.0392, "ÀûÀÚÀüÈ¯" );
+
+
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(1, "2001-08-17", 2651, 407, 302, 0, 50, 213, 216931, 8415 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(2, "2008-09-30", 1097, 2235, 127, 0, 31, 111, 544844, 12061 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(3, "2016-03-09", 798, 0, 398, 0, 3, 55, 275854, 20270 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(4, "2011-03-30", 688, 52, 155, 0, 56, 55, 109998, 7827 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(5, "2009-09-07", 617, 253, 54, 0, 8, 62, 325010, 16605 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(6, "2011-06-30", 597, 82, 147, 62, 27, 13, 99883, 4803 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(7, "2007-02-23", 483, 8372, 19, 88, 2, 33, 280561, 16067 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(8, "2009-06-05", 460, 7106, 51, 0, 32, 45, 392607, 6482 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(9, "2014-08-11", 384, 20, 175, 5, 0, 26, 260853, 19205 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(10, "2014-03-21", 383, 56, 117, 14, 2, 36, 208802, 16605 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(11, "2004-12-18", 301, 342, 54, 33, 0, 26, 325424, 6146 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(12, "2012-11-20", 238, 48, 62, 6, 32, 13, 115175, 6404 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(13, "2005-10-01", 225, 30, 22, 0, 35, 25, 92216, 4627 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(14, "2015-08-01", 224, 29, 55, 0, 16, 21, 176151, 11992 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(15, "2015-01-16", 224, 19, 54, 0, 13, 17, 196274, 17320 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(16, "2002-07-15", 172, 9455, 21, 0, 22, 2, 140700, 10060 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(17, "2018-01-02", 162, 2, 60, 0, 19, 0, 137315, 10529 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(18, "2016-04-22", 145, 31, 0, 0, 14, 24, 54624, 469 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(19, "2012-05-07", 138, 189, 14, 1, 14, 5, 207629, 4370 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(20, "2008-08-12", 125, 12, 48, 0, 0, 4, 403777, 30988 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(21, "2016-09-10", 117, 23, 34, 0, 25, 2, 188011, 24817 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(22, "2005-04-01", 114, 17, 1, 17, 0, 11, 154308, 5820 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(23, "2016-12-01", 83, 68, 47, 0, 7, 5, 252464, 25481 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(24, "2012-05-29", 81, 7, 17, 0, 27, 6, 61010, 3873 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(25, "2013-07-26", 70, 68, 3, 0, 24, 10, 259676, 18177 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(26, "2011-10-15", 49, 5, 2, 0, 3, 1, 107182, 3408 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(27, "1997-02-01", 19, 31, 0, 3, 5, 0, 105789, 4654 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(28, "2015-08-28", 8, 5, 1, 0, 0, 1, 101291, 6023 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(29, "2012-08-29", 8, 9455, 2, 0, 0, 0, 197649, 7110 );
+insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(30, "2006-09-29", 4, 31, 0, 1, 0, 0, 144411, 185 );
+
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(1, 9900, 3300, 5000, 110270, 2090, 66 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(2, 27500, 1650, 10000, 254500, 1822, 148.5 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(3, 0, 3300, 2000, 51590, 1581, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(4, 0, 0, 0, 61226, 2000, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(5, 6050, 550, 5000, 72749, 1650, 49.5 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(24, 5500, 3300, 3000, 41690, 1650, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(6, 5500, 3300, 5000, 52140, 2090, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(7, 3300, 770, 30000, 276686, 2073, 198 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(8, 14300, 1650, 10000, 200200, 2200, 132 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(9, 5500, 2200, 5000, 70510, 1767, 49.5 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(10, 5500, 1650, 5000, 55400, 1870, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(11, 11000, 0, 10000, 169108, 2200, 99 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(12, 5500, 3300, 5000, 59550, 1870, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(13, 3300, 3300, 2000, 58916, 2475, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(14, 5500, 3300, 0, 65660, 2090, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(15, 7700, 8800, 2000, 55000, 2200, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(16, 5500, 1100, 5000, 49300, 1650, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(17, 3300, 2200, 2000, 34900, 1438, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(18, 2200, 1100, 5000, 60720, 2750, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(19, 7700, 3300, 10000, 161800, 2825, 132 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(20, 5500, 3300, 3000, 54800, 2200, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(27, 11000, 0, 5000, 161700, 2400, 108.9 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(30, 16500, 0, 5000, 249500, 3080, 165 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(23, 11000, 5500, 0, 72600, 2888, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(25, 11000, 5500, 0, 72330, 2888, 26.4 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(29, 9350, 1650, 5000, 105500, 2300, 66 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(26, 10890, 1100, 3000, 75960, 1870, 66 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(28, 3300, 1650, 3000, 54560, 1870, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(21, 5500, 5500, 2000, 59213, 5921, 33 ); 
+insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(22, 7700, 3300, 10000, 156051, 2983, 99 ); 
+
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(1, 1, 6, "·ÑÄÉÀÌÅ©¸À ÄíÅ°", "1"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(2, 1, 3, "¹ÎÆ®ÃÊÄÚ ÄíÅ°", "2"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(3, 1, 5, "¸¶¹ý»ç¸À ÄíÅ°", "3"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(4, 2, 6, "¶ô½ºÅ¸¸À ÄíÅ°", "4"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(5, 1, 3, "È«°íÃß¸À ÄíÅ°", "5"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(6, 2, 1, "ºí·¢º£¸®¸À ÄíÅ°", "6"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(7, 1, 3, "±¸¹ÌÈ£¸À ÄíÅ°", "7"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(8, 2, 1, "¿þ¾î¿ïÇÁ¸À ÄíÅ°", "8"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(9, 2, 1, "¶óÀÓ¸À ÄíÅ°", "9"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(10, 1, 6, "Ã¼¸®¸À ÄíÅ°", "10"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(11, 1, 6, "´«¼³ÅÁ¸À ÄíÅ°" ,"11" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(12, 2, 7, "ÆÒÄÉÀÌÅ©¸À ÄíÅ°", "12"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(13, 2, 5, "´ÞÅä³¢¸À ÄíÅ°" ,"13" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(14, 1, 7, "½Ã³ª¸ó¸À ÄíÅ°", "14"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(15, 1, 3, "ÄÚÄÚ¾Æ¸À ÄíÅ°", "15"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(16, 2, 5, "Ä¡¾î¸®´õ¸À ÄíÅ°", "16"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(17, 1, 6, "ÇÎÅ©ÃÊÄÚÄíÅ°", "17"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(18, 2, 7, "Çãºê¸À ÄíÅ°", "18"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(19, 1, 2, "Ãµ»ç¸À ÄíÅ°","19"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(20, 1, 6, "¹ÚÇÏ»çÅÁ¸À ÄíÅ°","20"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password)values(21, 1, 6, "´ëÃß¸À ÄíÅ°","21"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(22, 1, 2, "·¹¸ó¸À ÄíÅ°","22"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(23, 2, 6, "¹Ù³ª³ª¸À ÄíÅ°","23"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(24, 2, 7, "ÇÇ½ºÅ¸Ä¡¿À¸À ÄíÅ°","24"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(25, 1, 2, "´ÑÀÚ¸À ÄíÅ°" ,"25" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(26, 2, 5, "½´Å©¸²¸À ÄíÅ°","26"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(27, 2, 5, "ÀÇÀû¸À ÄíÅ°" ,"27" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(28, 1, 3, "È­ÀÌÆ®ÃÊÄÚ ÄíÅ°" ,"28" );
+insert into customer(customer_id, sex_id, age_id, nickname, password)values(29, 2, 5, "ÇÇ°Ü¿©¿Õ¸À ÄíÅ°" ,"29" );
+insert into customer(customer_id, sex_id, age_id, nickname, password)values(30, 2, 2, "¾Ç¸¶¸À ÄíÅ°", "30"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(31, 1, 1, "¼Ò´Ù¸À ÄíÅ°", "31" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(32, 1, 1, "¶óÁîº£¸®¸À ÄíÅ°", "32" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(33, 1, 1, "ºí·çÆÄÀÌ¸À ÄíÅ°", "33" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(34, 1, 1, "Ä¡¾à¸À ÄíÅ°", "34" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(35, 1, 4, "ÀÚ¸ù¸À ÄíÅ°", "35" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(36, 1, 4, "Ä¡Å²¸À ÄíÅ°", "36"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(37, 1, 4, "ÇÇÀÚ¸À ÄíÅ°", "37"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(38, 1, 4, "ºí·¢Ä¿·±Æ®¸À ÄíÅ°", "38"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(39, 2, 3, "ºí·çº£¸®¸À ÄíÅ°", "39"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(40, 2, 3, "¹ÐÅ©ÃÊÄÚ¸À ÄíÅ°", "40"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(41, 2, 3, "¿¡ÀÏ¸®¾ð ÄíÅ°", "41"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(42, 2, 3, "¹«È­°ú¸À ÄíÅ°", "42"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(43, 2, 4, "¸Þ·Ð¸À ÄíÅ°", "43"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(44, 2, 4, "¼ö¹Ú¸À ÄíÅ°" , "44" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(45, 2, 4, "ÇÑ¶óºÀ¸À ÄíÅ°", "45" );
+
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(01, 1, 2, 1, 3, 5, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(01, 7, 5, 4, 3, 5, 1, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(01, 16, 1, 1, 3, 2, 4, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(01, 25, 3, 5, 4, 2, 1, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(01, 30, 4, 5, 3, 3, 3, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(02, 3, 2, 1, 5, 2, 4, 5, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(02, 7, 2, 5, 5, 3, 2, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(02, 15, 2, 3, 2, 5, 3, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(02, 22, 1, 1, 3, 2, 4, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(02, 27, 2, 4, 5, 5, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(03, 4, 1, 4, 3, 1, 4, 4, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(03, 15, 3, 4, 2, 4, 1, 4, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(03, 20, 5, 4, 1, 3, 5, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(03, 24, 4, 3, 1, 2, 5, 5, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(03, 28, 4, 3, 4, 1, 2, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(04, 3, 2, 3, 2, 5, 4, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(04, 10, 4, 5, 2, 1, 4, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(04, 12, 3, 3, 5, 1, 1, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(04, 15, 2, 4, 5, 4, 3, 5, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(04, 30, 3, 4, 2, 2, 5, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(05, 2, 2, 4, 2, 1, 2, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(05, 3, 5, 1, 5, 1, 4, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(05, 22, 2, 1, 1, 1, 4, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(05, 24, 1, 5, 4, 4, 3, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(05, 25, 2, 1, 3, 3, 1, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(06, 7, 3, 2, 4, 2, 4, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(06, 10, 5, 5, 1, 5, 5, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(06, 17, 5, 2, 5, 1, 1, 1, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(06, 23, 1, 3, 1, 1, 3, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(06, 26, 2, 5, 2, 5, 2, 5, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(07, 4, 1, 4, 1, 4, 4, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(07, 13, 3, 2, 4, 1, 1, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(07, 15, 2, 3, 5, 5, 1, 2, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(07, 19, 3, 3, 4, 4, 1, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(07, 24, 5, 1, 1, 4, 5, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(08, 4, 3, 3, 4, 5, 2, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(08, 5, 5, 2, 1, 1, 2, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(08, 14, 1, 4, 1, 4, 5, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(08, 16, 1, 5, 3, 5, 3, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(08, 21, 3, 1, 4, 2, 1, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(09, 4, 5, 4, 1, 5, 2, 1, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(09, 12, 5, 4, 1, 2, 4, 2, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(09, 14, 5, 3, 5, 4, 2, 4, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(09, 24, 4, 1, 1, 4, 3, 4, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(09, 26, 4, 4, 2, 2, 2, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(10, 2, 2, 2, 2, 1, 1, 3, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(10, 10, 4, 2, 1, 5, 4, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(10, 16, 1, 1, 1, 1, 3, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(10, 23, 4, 3, 1, 1, 3, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(10, 30, 1, 4, 3, 2, 3, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(11, 2, 2, 4, 4, 3, 4, 1, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(11, 9, 2, 5, 4, 5, 2, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(11, 10, 2, 3, 2, 1, 5, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(11, 22, 2, 3, 5, 5, 3, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(11, 26, 3, 2, 3, 1, 4, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(12, 3, 4, 4, 4, 2, 4, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(12, 11, 1, 3, 4, 1, 4, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(12, 12, 1, 4, 5, 1, 2, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(12, 14, 3, 1, 2, 2, 3, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(12, 19, 2, 3, 3, 1, 5, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(13, 8, 2, 1, 5, 2, 5, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(13, 14, 3, 2, 3, 1, 3, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(13, 17, 2, 4, 1, 2, 3, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(13, 24, 1, 4, 1, 5, 4, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(13, 27, 2, 4, 3, 5, 3, 5, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(14, 13, 1, 1, 1, 2, 1, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(14, 17, 5, 3, 1, 2, 2, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(14, 22, 5, 1, 4, 1, 2, 1, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(14, 24, 5, 2, 5, 5, 3, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(14, 27, 3, 5, 3, 1, 1, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(15, 2, 4, 4, 4, 2, 1, 3, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(15, 9, 4, 5, 3, 5, 3, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(15, 18, 2, 4, 5, 2, 4, 2, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(15, 26, 2, 5, 3, 3, 2, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(15, 28, 1, 3, 5, 5, 3, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(16, 1, 4, 1, 1, 4, 4, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(16, 2, 2, 2, 3, 2, 3, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(16, 3, 5, 1, 2, 1, 5, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(16, 17, 2, 5, 1, 5, 4, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(16, 23, 2, 3, 5, 4, 1, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(17, 2, 1, 5, 5, 2, 1, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(17, 7, 4, 5, 5, 2, 2, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(17, 19, 5, 2, 5, 4, 3, 2, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(17, 24, 5, 4, 1, 2, 1, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(17, 28, 4, 5, 1, 5, 2, 4, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(18, 1, 5, 4, 1, 2, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(18, 11, 2, 2, 2, 4, 4, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(18, 12, 3, 1, 5, 5, 3, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(18, 15, 2, 2, 1, 5, 4, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(18, 17, 1, 3, 1, 2, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(19, 15, 5, 3, 1, 3, 3, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(19, 19, 2, 5, 2, 1, 4, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(19, 24, 4, 3, 5, 5, 3, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(19, 26, 1, 1, 4, 1, 3, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(19, 30, 4, 5, 2, 2, 4, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(20, 1, 3, 1, 3, 4, 2, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(20, 8, 3, 2, 3, 1, 1, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(20, 14, 5, 4, 4, 4, 1, 5, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(20, 22, 3, 4, 4, 4, 5, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(20, 25, 2, 5, 2, 1, 2, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(21, 11, 3, 5, 3, 4, 5, 2, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(21, 16, 2, 1, 2, 4, 5, 5, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(21, 17, 4, 1, 4, 4, 5, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(21, 24, 5, 1, 3, 2, 3, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(21, 26, 5, 2, 2, 3, 2, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(22, 7, 2, 3, 3, 1, 1, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(22, 9, 5, 5, 3, 3, 1, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(22, 11, 2, 5, 4, 4, 2, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(22, 22, 3, 1, 5, 1, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(22, 30, 3, 3, 5, 2, 4, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(23, 2, 2, 1, 3, 3, 1, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(23, 7, 1, 5, 5, 1, 5, 1, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(23, 8, 2, 2, 4, 5, 1, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(23, 12, 4, 2, 2, 5, 1, 2, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(23, 29, 4, 3, 4, 1, 4, 2, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(24, 9, 1, 2, 1, 1, 2, 2, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(24, 13, 4, 5, 4, 3, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(24, 14, 1, 3, 1, 1, 4, 4, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(24, 19, 4, 4, 4, 5, 2, 2, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(24, 25, 2, 4, 3, 3, 5, 2, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(25, 1, 2, 5, 2, 4, 5, 4, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(25, 2, 2, 5, 5, 1, 5, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(25, 12, 5, 1, 1, 2, 3, 4, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(25, 15, 3, 5, 5, 1, 5, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(25, 20, 2, 3, 4, 1, 5, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(26, 4, 2, 5, 5, 3, 4, 3, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(26, 7, 1, 5, 5, 3, 5, 1, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(26, 20, 1, 4, 4, 3, 1, 2, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(26, 23, 2, 1, 3, 4, 1, 4, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(26, 26, 3, 4, 1, 4, 5, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(27, 5, 1, 4, 3, 4, 1, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(27, 6, 2, 3, 1, 2, 4, 2, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(27, 9, 1, 1, 4, 2, 3, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(27, 15, 5, 3, 4, 5, 3, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(27, 22, 5, 4, 2, 4, 4, 1, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(28, 7, 2, 3, 3, 5, 4, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(28, 8, 4, 4, 4, 2, 1, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(28, 14, 2, 1, 4, 4, 3, 2, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(28, 22, 2, 4, 3, 2, 5, 2, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(28, 29, 5, 4, 1, 5, 4, 2, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(29, 5, 3, 1, 2, 4, 5, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(29, 10, 2, 4, 5, 3, 5, 2, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(29, 15, 4, 5, 2, 3, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(29, 16, 4, 1, 3, 3, 5, 1, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(29, 28, 1, 3, 4, 4, 1, 4, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(30, 3, 2, 2, 5, 2, 3, 2, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(30, 4, 5, 3, 2, 2, 2, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(30, 17, 2, 5, 4, 5, 1, 5, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(30, 27, 3, 2, 5, 4, 2, 2, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(30, 30, 4, 4, 2, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(31, 1, 4, 4, 2, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(31, 4, 3, 4, 4, 4, 5, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(31, 6, 2, 4, 5, 4, 5, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(31, 7, 5, 4, 5, 4, 5, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(31, 11, 4, 4, 2, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(32, 13, 4, 4, 2, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(32, 2, 4, 4, 2, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(32, 5, 4, 4, 2, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(32, 8, 4, 4, 2, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(32, 9, 4, 4, 2, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(33, 29, 5, 4, 2, 4, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(33, 30, 5, 4, 3, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(33, 28,3 ,4, 2, 4, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(33, 4, 5, 4, 5, 4, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(33, 16, 4, 3, 4, 4, 5, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(34, 27, 2, 4, 2, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(34, 24, 3, 4, 3, 4, 5, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(34, 3,2 ,5, 2, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(34, 8, 4, 4, 5, 4, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(34, 17, 5, 4, 3, 2, 5, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(35, 22, 5, 4, 2, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(35, 23, 3, 4, 3, 4, 4, 5, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(35, 6, 2 ,5, 2, 4, 4, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(35, 7, 3, 4, 3, 4, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(35, 25, 3, 2, 1, 2, 5, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(36, 1, 5, 4, 2, 4, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(36, 30, 5, 4, 3, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(36, 5, 4 ,4, 2, 4, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(36, 2, 5, 4, 5, 4, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(36, 18, 4, 3, 4, 4, 5, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(37, 3, 4, 4, 2, 4, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(37, 29, 4, 4, 3, 4, 5, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(37, 28,5 ,4, 3, 3, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(37, 27, 5, 4, 4, 4, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(37, 26, 4, 3, 5, 4, 2, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(38, 4 , 3, 4, 4, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(38, 6, 5, 4, 3, 4, 3, 4, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(38, 8,5 ,3, 2, 2, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(38, 14, 5, 3, 5, 4, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(38, 16, 4, 4, 4, 4, 4, 4, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(39, 7 , 2, 4, 4, 4, 5, 3, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(39, 9, 2, 4, 3, 4, 3, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(39, 10,5 ,5, 2, 2, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(39, 11, 2, 4, 5, 4, 5, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(40, 23 , 2, 5, 4, 4, 5, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(40, 28 , 3, 5, 4, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(40, 29 , 3, 2, 5, 4, 5, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(40, 14 , 2, 4, 4, 4, 5, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(40, 19 , 2, 3, 3, 3, 5, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(41, 21 , 4, 4, 4, 1, 5, 4, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(41, 22 , 3, 5, 4, 1, 5, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(41, 9 , 2, 2, 2, 4, 5, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(41, 4 , 2, 3, 4, 2, 5, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(42, 3 , 2, 5, 4, 4, 5, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(42, 8 , 3, 5, 4, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(42, 2 , 3, 1, 4, 5, 4, 1, 1 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(42, 1 , 2, 4, 4, 4, 3, 3, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(42, 17 , 2, 5, 4, 5, 2, 5, 3 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(43, 1 , 5, 3, 3, 4, 3, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(43, 18 , 5, 5, 4, 2, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(43, 19 , 4, 2, 5, 3, 3, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(43, 17 , 3, 4, 4, 3, 5, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(43, 21 , 3, 5, 4, 3, 5, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(44, 23 , 2, 5, 4, 4, 5, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(44, 28 , 3, 5, 4, 4, 5, 3, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(44, 29 , 3, 2, 5, 4, 5, 2, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(44, 14 , 2, 4, 4, 4, 5, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(44, 19 , 2, 5, 4, 4, 5, 3, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(45, 15 , 4, 5, 4, 4, 5, 2, 5 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(45, 28 , 4, 5, 4, 4, 5, 4, 4 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(45, 29 , 4, 2, 4, 4, 5, 1, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(45, 13 , 2, 4, 3, 4, 5, 5, 2 );
+insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(45, 7 , 2, 5, 3, 4, 3, 3, 5 );
