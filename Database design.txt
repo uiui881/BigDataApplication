@@ -1,5 +1,140 @@
 use team06;
 
+
+drop table rate;
+drop table customer;
+drop table opening_cost;
+drop table current_situation;
+drop table profitability;
+drop table stability;
+drop table sex;
+drop table brand;
+drop table company;
+drop table age;
+
+drop view franchisesNumSum;
+
+use team06;
+
+create table age ( 
+    age_id int,
+    age varchar(10) not null,
+    PRIMARY KEY(age_id)
+);
+
+create table company( 
+	company_id int,
+	company_name varchar(30) not null,
+	PRIMARY KEY(company_id)
+);
+create table brand(
+    brand_id int,
+    brand_name varchar(50) not null,
+    company_id int,  
+    PRIMARY KEY(brand_id),
+    FOREIGN KEY(company_id) REFERENCES company(company_id) on DELETE CASCADE
+);
+
+create table sex(
+     sex_id int,
+     sex_name varchar(10) not null,
+     PRIMARY KEY(sex_id)
+);
+
+
+create table stability(
+        company_id int,
+        yr int, 
+        capital double, 
+        debt double, 
+        dept_ratio int ,
+        equity_capital_ratio int,
+        violation_of_the_law int,
+        PRIMARY KEY(company_id, yr),
+	FOREIGN KEY(company_id) REFERENCES company(company_id) on DELETE CASCADE
+);
+
+
+
+
+create table profitability(
+        company_id int,
+        yr int, 
+        asset int,
+        sales int, 
+        operatingprofit int,
+        totalassetgrowthrate float, 
+        salesgrowthrate float, 
+        operatingprofitgrowthrate varchar(10) not null,
+        PRIMARY KEY(company_id, yr),
+	FOREIGN KEY(company_id) REFERENCES company(company_id) on DELETE CASCADE
+);
+
+
+create table current_situation(
+        brand_id int,
+        opening_date Date not null,
+        NumberOfFranchises int,
+        NumberOfEmployees int not null,
+        Scheduled_To_Open int,
+        Scheduled_To_Close int,
+        Contract_Termination int,
+        Transfer int,
+        AverageSales int,
+        Average_Sales_per_Area int,
+        PRIMARY KEY(brand_id),
+        FOREIGN KEY(brand_id) REFERENCES brand(brand_id) on DELETE CASCADE
+);
+
+create table opening_cost( 
+        brand_id int,
+        subscript_fee int,
+        education_fee int,
+        deposit_fee int,
+        extra_fee int,
+        cost_per_area int,
+        standard_area float,
+        PRIMARY KEY(brand_id),
+	FOREIGN KEY(brand_id) REFERENCES brand(brand_id) on DELETE CASCADE
+);
+
+
+create table customer(
+        customer_id int,
+        sex_id int,
+        age_id int,
+        nickname  varchar(30) not null,
+        password varchar(30) not null,
+        PRIMARY KEY(customer_id),
+        FOREIGN KEY(sex_id) REFERENCES sex(sex_id) on DELETE CASCADE,
+        FOREIGN KEY(age_id) REFERENCES age(age_id) on DELETE CASCADE
+);
+
+create table rate(
+        customer_id int,
+        brand_id int,
+        staff_service int, 
+        accessibility int,
+        convenience int,
+        taste_menu int,
+        price int,
+        additional_service int,
+        service_favorability int,
+        PRIMARY KEY(customer_id,brand_id),
+        FOREIGN KEY(customer_id) REFERENCES customer(customer_id) on DELETE CASCADE,
+ FOREIGN KEY(brand_id) REFERENCES brand(brand_id) on DELETE CASCADE	
+);
+
+create view franchisesNumSum as
+select brand.company_id, sum(current_situation.NumberOfFranchises), ntile(5) over(order by sum(current_situation.NumberOfFranchises) asc)
+FROM brand, current_situation where brand.brand_id = current_situation.brand_id 
+group by brand.company_id
+order by brand.company_id;
+
+create index customer_nickname_index on customer(nickname);
+
+use team06;
+
 insert into age(age_id, age) values(1, "10s");
 insert into age(age_id, age) values(2, "20s");
 insert into age(age_id, age) values(3, "30s");
@@ -8,63 +143,63 @@ insert into age(age_id, age) values(5, "50s");
 insert into age(age_id, age) values(6, "60s");
 insert into age(age_id, age) values(7, "over 70");
 
-insert into company(company_id, company_name) values(1, "ë¡¯ë°ì§€ì•Œì—ìŠ¤(ì£¼)" );
-insert into company(company_id, company_name) values(2, "(ì£¼)ì´ëœë“œíŒŒí¬" );
-insert into company(company_id, company_name) values(3, "(ì£¼)ì´ë””ì•¼" );
-insert into company(company_id, company_name) values(4, "(ì£¼)ë”ë³¸ì½”ë¦¬ì•„" );
-insert into company(company_id, company_name) values(5, "(ì£¼)íƒì•¤íƒìŠ¤" );
-insert into company(company_id, company_name) values(6, "(ì£¼)ë”ë²¤í‹°ì½”ë¦¬ì•„" );
-insert into company(company_id, company_name) values(7, "(ì£¼)ë‹¬ì½¤" );
-insert into company(company_id, company_name) values(8, "(ì£¼)ì„¸ì»¨ë“œì°¬ìŠ¤" );
-insert into company(company_id, company_name) values(9, "(ì£¼)ì»¤í”¼ì—ë°˜í•˜ë‹¤" );
-insert into company(company_id, company_name) values(10, "(ì£¼)ë§¥ìŠ¤ì›ì´ë§í¬" );
-insert into company(company_id, company_name) values(11, "(ì£¼)ì•¤í•˜ìš°ìŠ¤" );
-insert into company(company_id, company_name) values(12, "(ì£¼)ë§¤ë¨¸ë“œì»¤í”¼ë©" );
-insert into company(company_id, company_name) values(13, "(ì£¼)ì¹´í˜ë´„ë´„" );
-insert into company(company_id, company_name) values(14, "(ì£¼)ì—ìŠ¤ì•¤íí”ŒëŸ¬ìŠ¤" );
-insert into company(company_id, company_name) values(15, "(ì£¼)ì œì´ì— ì»¤í”¼ì»´í¼ë‹ˆ" );
-insert into company(company_id, company_name) values(16, "(ì£¼)ë‹¤ë¹ˆì¹˜" );
-insert into company(company_id, company_name) values(17, "(ì£¼)ì»¤í”¼ë§Œì»´í¼ë‹ˆ" );
-insert into company(company_id, company_name) values(18, "(ì£¼)ë¹„ë¸Œë¼ë”ìŠ¤" );
-insert into company(company_id, company_name) values(19, "(ì£¼)ë£¨ì•¤ë¹„" );
-insert into company(company_id, company_name) values(20, "(ì£¼)ì¹´í˜ì›í”ŒëŸ¬ìŠ¤ì›" );
-insert into company(company_id, company_name) values(21, "(ì£¼)ë¹„ì¼€ì´ì»´í¼ë‹ˆ" );
-insert into company(company_id, company_name) values(22, "(ì£¼)íŒŒë¦¬í¬ë¼ìƒ" );
-insert into company(company_id, company_name) values(23, "(ì£¼)í¬ì²œ" );
-insert into company(company_id, company_name) values(24, "(ì£¼)ì»¤í”¼ë² ì´" );
-insert into company(company_id, company_name) values(25, "íˆ¬ì¸í”Œë ˆì´ìŠ¤ãˆœ" );
-insert into company(company_id, company_name) values(26, "ãˆœë² ëª¨ìŠ¤" );
+insert into company(company_id, company_name) values(1, "·Ôµ¥Áö¾Ë¿¡½º(ÁÖ)" );
+insert into company(company_id, company_name) values(2, "(ÁÖ)ÀÌ·£µåÆÄÅ©" );
+insert into company(company_id, company_name) values(3, "(ÁÖ)ÀÌµğ¾ß" );
+insert into company(company_id, company_name) values(4, "(ÁÖ)´õº»ÄÚ¸®¾Æ" );
+insert into company(company_id, company_name) values(5, "(ÁÖ)Å½¾ØÅ½½º" );
+insert into company(company_id, company_name) values(6, "(ÁÖ)´õº¥Æ¼ÄÚ¸®¾Æ" );
+insert into company(company_id, company_name) values(7, "(ÁÖ)´ŞÄŞ" );
+insert into company(company_id, company_name) values(8, "(ÁÖ)¼¼ÄÁµåÂù½º" );
+insert into company(company_id, company_name) values(9, "(ÁÖ)Ä¿ÇÇ¿¡¹İÇÏ´Ù" );
+insert into company(company_id, company_name) values(10, "(ÁÖ)¸Æ½º¿øÀÌ¸µÅ©" );
+insert into company(company_id, company_name) values(11, "(ÁÖ)¾ØÇÏ¿ì½º" );
+insert into company(company_id, company_name) values(12, "(ÁÖ)¸Å¸ÓµåÄ¿ÇÇ·¦" );
+insert into company(company_id, company_name) values(13, "(ÁÖ)Ä«Æäº½º½" );
+insert into company(company_id, company_name) values(14, "(ÁÖ)¿¡½º¾ØÅ¥ÇÃ·¯½º" );
+insert into company(company_id, company_name) values(15, "(ÁÖ)Á¦ÀÌ¿¥Ä¿ÇÇÄÄÆÛ´Ï" );
+insert into company(company_id, company_name) values(16, "(ÁÖ)´ÙºóÄ¡" );
+insert into company(company_id, company_name) values(17, "(ÁÖ)Ä¿ÇÇ¸¸ÄÄÆÛ´Ï" );
+insert into company(company_id, company_name) values(18, "(ÁÖ)ºñºê¶ó´õ½º" );
+insert into company(company_id, company_name) values(19, "(ÁÖ)·ç¾Øºñ" );
+insert into company(company_id, company_name) values(20, "(ÁÖ)Ä«Æä¿øÇÃ·¯½º¿ø" );
+insert into company(company_id, company_name) values(21, "(ÁÖ)ºñÄÉÀÌÄÄÆÛ´Ï" );
+insert into company(company_id, company_name) values(22, "(ÁÖ)ÆÄ¸®Å©¶ó»ó" );
+insert into company(company_id, company_name) values(23, "(ÁÖ)ÈñÃµ" );
+insert into company(company_id, company_name) values(24, "(ÁÖ)Ä¿ÇÇº£ÀÌ" );
+insert into company(company_id, company_name) values(25, "Åõ½æÇÃ·¹ÀÌ½º¢ß" );
+insert into company(company_id, company_name) values(26, "¢ßº£¸ğ½º" );
 
-insert into brand(brand_id, brand_name, company_id) values(1, "ì´ë””ì•¼ì»¤í”¼", 3);
-insert into brand(brand_id, brand_name, company_id) values(2, "íˆ¬ì¸í”Œë ˆì´ìŠ¤", 25);
-insert into brand(brand_id, brand_name, company_id) values(3, "ë©”ê°€ì— ì§€ì”¨ì»¤í”¼(MEGA MGC COFFEE)", 11);
-insert into brand(brand_id, brand_name, company_id) values(4, "ì»¤í”¼ì—ë°˜í•˜ë‹¤", 9);
-insert into brand(brand_id, brand_name, company_id) values(5, "ë¹½ë‹¤ë°©", 4);
-insert into brand(brand_id, brand_name, company_id) values(6, "ì»¤í”¼ë² ì´", 24);
-insert into brand(brand_id, brand_name, company_id) values(7, "ì—”ì œë¦¬ë„ˆìŠ¤", 1);
-insert into brand(brand_id, brand_name, company_id) values(8, "íŒŒìŠ¤ì¿ ì°Œ", 22);
-insert into brand(brand_id, brand_name, company_id) values(9, "ì»´í¬ì¦ˆì»¤í”¼(COMPOSE COFFEE)", 15);
-insert into brand(brand_id, brand_name, company_id) values(10, "ë”ë²¤í‹°", 6);
-insert into brand(brand_id, brand_name, company_id) values(11, "íƒì•¤íƒìŠ¤ì»¤í”¼(TOMNTOMS COFFEE)", 5);
-insert into brand(brand_id, brand_name, company_id) values(12, "ì…€ë ‰í† ì»¤í”¼", 10);
-insert into brand(brand_id, brand_name, company_id) values(13, "í† í”„ë ˆì†Œ", 14);
-insert into brand(brand_id, brand_name, company_id) values(14, "ë”ë¦¬í„°(THE LITER)", 23);
-insert into brand(brand_id, brand_name, company_id) values(15, "ë´„ë´„í…Œì´í¬ì•„ì›ƒ(ë´„ë´„TAKE-OUT)", 13);
-insert into brand(brand_id, brand_name, company_id) values(16, "ë”ì¹´í˜", 2);
-insert into brand(brand_id, brand_name, company_id) values(17, "ê°ì„±ì»¤í”¼", 18);
-insert into brand(brand_id, brand_name, company_id) values(18, "ì—‘ì†Œì—‘ì†Œí•«ë„ê·¸ì•¤ì»¤í”¼", 8);
-insert into brand(brand_id, brand_name, company_id) values(19, "ë‹¬ì½¤", 7);
-insert into brand(brand_id, brand_name, company_id) values(20, "ì•„ë§ˆìŠ¤ë¹ˆ", 21);
-insert into brand(brand_id, brand_name, company_id) values(21, "ì»¤í”¼ì˜¨ë¦¬", 17);
-insert into brand(brand_id, brand_name, company_id) values(22, "ì¹´í˜ë ì•„ëª¨", 26);
-insert into brand(brand_id, brand_name, company_id) values(23, "ë§¤ë¨¸ë“œìµìŠ¤í”„ë ˆìŠ¤(Mammoth Express)", 12);
-insert into brand(brand_id, brand_name, company_id) values(24, "ì¹´í˜ë£¨ì•¤ë¹„", 19);
-insert into brand(brand_id, brand_name, company_id) values(25, "ë§¤ë¨¸ë“œì»¤í”¼(Mammoth coffee)", 12);
-insert into brand(brand_id, brand_name, company_id) values(26, "ì¹´í˜ì›í”ŒëŸ¬ìŠ¤ì›", 20);
-insert into brand(brand_id, brand_name, company_id) values(27, "ë‹¤ë¹ˆì¹˜ì»¤í”¼", 16);
+insert into brand(brand_id, brand_name, company_id) values(1, "ÀÌµğ¾ßÄ¿ÇÇ", 3);
+insert into brand(brand_id, brand_name, company_id) values(2, "Åõ½æÇÃ·¹ÀÌ½º", 25);
+insert into brand(brand_id, brand_name, company_id) values(3, "¸Ş°¡¿¥Áö¾¾Ä¿ÇÇ(MEGA MGC COFFEE)", 11);
+insert into brand(brand_id, brand_name, company_id) values(4, "Ä¿ÇÇ¿¡¹İÇÏ´Ù", 9);
+insert into brand(brand_id, brand_name, company_id) values(5, "»ª´Ù¹æ", 4);
+insert into brand(brand_id, brand_name, company_id) values(6, "Ä¿ÇÇº£ÀÌ", 24);
+insert into brand(brand_id, brand_name, company_id) values(7, "¿£Á¦¸®³Ê½º", 1);
+insert into brand(brand_id, brand_name, company_id) values(8, "ÆÄ½ºÄíÂî", 22);
+insert into brand(brand_id, brand_name, company_id) values(9, "ÄÄÆ÷ÁîÄ¿ÇÇ(COMPOSE COFFEE)", 15);
+insert into brand(brand_id, brand_name, company_id) values(10, "´õº¥Æ¼", 6);
+insert into brand(brand_id, brand_name, company_id) values(11, "Å½¾ØÅ½½ºÄ¿ÇÇ(TOMNTOMS COFFEE)", 5);
+insert into brand(brand_id, brand_name, company_id) values(12, "¼¿·ºÅäÄ¿ÇÇ", 10);
+insert into brand(brand_id, brand_name, company_id) values(13, "ÅäÇÁ·¹¼Ò", 14);
+insert into brand(brand_id, brand_name, company_id) values(14, "´õ¸®ÅÍ(THE LITER)", 23);
+insert into brand(brand_id, brand_name, company_id) values(15, "º½º½Å×ÀÌÅ©¾Æ¿ô(º½º½TAKE-OUT)", 13);
+insert into brand(brand_id, brand_name, company_id) values(16, "´õÄ«Æä", 2);
+insert into brand(brand_id, brand_name, company_id) values(17, "°¨¼ºÄ¿ÇÇ", 18);
+insert into brand(brand_id, brand_name, company_id) values(18, "¿¢¼Ò¿¢¼ÒÇÖµµ±×¾ØÄ¿ÇÇ", 8);
+insert into brand(brand_id, brand_name, company_id) values(19, "´ŞÄŞ", 7);
+insert into brand(brand_id, brand_name, company_id) values(20, "¾Æ¸¶½ººó", 21);
+insert into brand(brand_id, brand_name, company_id) values(21, "Ä¿ÇÇ¿Â¸®", 17);
+insert into brand(brand_id, brand_name, company_id) values(22, "Ä«Æä¶ì¾Æ¸ğ", 26);
+insert into brand(brand_id, brand_name, company_id) values(23, "¸Å¸ÓµåÀÍ½ºÇÁ·¹½º(Mammoth Express)", 12);
+insert into brand(brand_id, brand_name, company_id) values(24, "Ä«Æä·ç¾Øºñ", 19);
+insert into brand(brand_id, brand_name, company_id) values(25, "¸Å¸ÓµåÄ¿ÇÇ(Mammoth coffee)", 12);
+insert into brand(brand_id, brand_name, company_id) values(26, "Ä«Æä¿øÇÃ·¯½º¿ø", 20);
+insert into brand(brand_id, brand_name, company_id) values(27, "´ÙºóÄ¡Ä¿ÇÇ", 16);
 insert into brand(brand_id, brand_name, company_id) values(28, "1LiTER COFFEE", 20);
-insert into brand(brand_id, brand_name, company_id) values(29, "ë£¨ê³ ", 2);
-insert into brand(brand_id, brand_name, company_id) values(30, "ì¹´í˜ë‹¤ë¹ˆì¹˜", 16);
+insert into brand(brand_id, brand_name, company_id) values(29, "·ç°í", 2);
+insert into brand(brand_id, brand_name, company_id) values(30, "Ä«Æä´ÙºóÄ¡", 16);
 
 insert into sex(sex_id, sex_name) values(1, "Female" );
 insert into sex(sex_id, sex_name) values(2, "Male" );
@@ -150,7 +285,7 @@ insert into stability(company_id, yr, capital, debt, dept_ratio, equity_capital_
 
 
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(1, 2018, 1125513000, 907066000, 3162000, -0.0144, -0.0441, "-0.8359" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(2, 2018, 768837460, 682431869, -17735589, -0.1243, -0.1527, "ì ìì§€ì†" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(2, 2018, 768837460, 682431869, -17735589, -0.1243, -0.1527, "ÀûÀÚÁö¼Ó" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(3, 2018, 105342107, 184124914, 20199892, 0.1986, 0.1992, "0.2797" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(4, 2018, 84998333, 174084567, 12807635, 0.193, -0.0045, "-0.3519" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(5, 2018, 69984675, 82387074, 4117088, 0.0223, -0.052, "0.7435" );
@@ -164,12 +299,12 @@ insert into profitability(company_id, yr, asset, sales, operatingprofit, totalas
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(13, 2018, 5548713, 7429420, 1589540, 1.2666, 0.5659, "0.4546" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(14, 2018, 2303810, 6381871, 48645, 0.0566, -0.0323, "2.6337" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(15, 2018, 2765180, 5439159, 815352, 0.7816, 0.109, "0.8122" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2018, 5997237, 4130907, -95558, -0.0683, -0.1557, "ì ìì „í™˜" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2018, 5997237, 4130907, -95558, -0.0683, -0.1557, "ÀûÀÚÀüÈ¯" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(17, 2018, 826352, 3729685, 137565, 0.761, 1.8501, "0.2312" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(18, 2018, 1424578, 3051621, 162581, 0.4413, 0.0986, "1.6965" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2018, 1588681, 2816819, -102893, 0.1363, -0.2913, "ì ìì „í™˜" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2018, 1588681, 2816819, -102893, 0.1363, -0.2913, "ÀûÀÚÀüÈ¯" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(20, 2018, 1367038, 1469709, 107514, -0.1249, -0.2562, "-0.3259" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(21, 2018, 139526, 348056, 109956, 0.7033, 1.3392, "í‘ìì „í™˜" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(21, 2018, 139526, 348056, 109956, 0.7033, 1.3392, "ÈæÀÚÀüÈ¯" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(22, 2018, 1308943073, 1774316302, 43545110, 0.0837, -0.0016, "-0.3449" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(23, 2018, 0, 0, 0, 0, 0, "null" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(24, 2018, 0, 0, 0, 0, 0, "null" );
@@ -184,7 +319,7 @@ insert into profitability(company_id, yr, asset, sales, operatingprofit, totalas
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(8, 2019, 12638926, 33672543, 540683, 2.8586, 1.1006, "1.3732" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(6, 2019, 6057072, 28460703, 1730089, -0.1114, 0.1989, "0.7267" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(24, 2019, 11176081, 23193160, 2560472, 0.0541, 0.2026, "1.6455" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(7, 2019, 24472784, 18540778, -3538898, 0.6332, -0.0752, "ì ìì „í™˜" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(7, 2019, 24472784, 18540778, -3538898, 0.6332, -0.0752, "ÀûÀÚÀüÈ¯" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(11, 2019, 9916326, 16325621, 7645810, 1.0681, 0.5353, "1.4207" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(9, 2019, 9910549, 14001142, 743902, 0.4106, 0.1859, "0.58" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(12, 2019, 3703592, 10974574, 225907, 0.2015, 0.2997, "-0.3791" );
@@ -193,9 +328,9 @@ insert into profitability(company_id, yr, asset, sales, operatingprofit, totalas
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(15, 2019, 3673341, 6516524, 1127362, 0.3284, 0.1981, "0.3827" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(14, 2019, 2316013, 6313827, 31686, 0.0053, -0.0107, "-0.3486" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(18, 2019, 1816007, 4593151, 314880, 0.2748, 0.5052, "0.9368" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2019, 4707020, 2874618, -110234, -0.2151, -0.3041, "ì ìì§€ì†" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2019, 4707020, 2874618, -110234, -0.2151, -0.3041, "ÀûÀÚÁö¼Ó" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(17, 2019, 1111584, 1830443, 240656, 0.3452, -0.5092, "0.7494" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2019, 1683539, 1616632, -164240, 0.0597, -0.4261, "ì ìì§€ì†" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2019, 1683539, 1616632, -164240, 0.0597, -0.4261, "ÀûÀÚÁö¼Ó" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(21, 2019, 865924, 1291909, 461346, 5.2062, 2.7118, "3.1957" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(20, 2019, 1314005, 1218644, 33058, -0.0388, -0.1708, "-0.6925" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(2, 2019, 0, 0, 0, 0, 0, "null" );
@@ -208,7 +343,7 @@ insert into profitability(company_id, yr, asset, sales, operatingprofit, totalas
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(3, 2020, 124860906, 220779522, 19447929, 0.1481, 0.1013, "0.1019" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(5, 2020, 112673184, 68366316, 1702204, -0.0687, -0.0764, "-0.3251" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(4, 2020, 109014451, 120090805, 11268245, 0.2149, -0.3239, "0.1049" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(7, 2020, 25972183, 19186823, -3854347, 0.0613, 0.0348, "ì ìì§€ì†" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(7, 2020, 25972183, 19186823, -3854347, 0.0613, 0.0348, "ÀûÀÚÁö¼Ó" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(11, 2020, 24323885, 35019820, 18328333, 1.4529, 1.1451, "1.3972" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(24, 2020, 11454498, 26830016, 2932592, 0.0249, 0.1568, "0.1453" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(9, 2020, 10348172, 17200767, 911241, 0.0442, 0.2285, "0.2249" );
@@ -216,17 +351,17 @@ insert into profitability(company_id, yr, asset, sales, operatingprofit, totalas
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(6, 2020, 9625366, 37129652, 2812817, 0.5891, 0.3046, "0.6258" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(15, 2020, 7349962, 12769577, 2420029, 1.0009, 0.9596, "1.1466" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(13, 2020, 6246191, 10164661, 1090127, null, null, "null" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(26, 2020, 6138192, 4720407, -289947, -0.0584, -0.313, "ì ìì „í™˜" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(26, 2020, 6138192, 4720407, -289947, -0.0584, -0.313, "ÀûÀÚÀüÈ¯" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(10, 2020, 5582213, 10668585, 226317, 0.2721, 0.0309, "0.3691" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(23, 2020, 4880545, 22604248, 1725451, 0.5216, 0.0725, "1.1979" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(12, 2020, 4365130, 13262117, 370381, 0.1786, 0.2084, "0.6395" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2020, 4330314, 2665859, -129587, -0.08, -0.0726, "ì ìì§€ì†" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(16, 2020, 4330314, 2665859, -129587, -0.08, -0.0726, "ÀûÀÚÁö¼Ó" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(18, 2020, 2598730, 5421380, 811974, 0.431, 0.1803, "1.5787" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(14, 2020, 2205353, 5601859, 2505, -0.0478, -0.1128, "-0.9209" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(21, 2020, 1484119, 1925058, 247871, 0.7139, 0.4901, "-0.4627" );
 insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(20, 2020, 1335360, 1056939, 18380, 0.0163, -0.1327, "-0.444" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2020, 1218613, 888758, -86635, -0.2762, -0.4502, "ì ìì§€ì†" );
-insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(17, 2020, 902809, 1902106, -110454, -0.1878, 0.0392, "ì ìì „í™˜" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(19, 2020, 1218613, 888758, -86635, -0.2762, -0.4502, "ÀûÀÚÁö¼Ó" );
+insert into profitability(company_id, yr, asset, sales, operatingprofit, totalassetgrowthrate, salesgrowthrate, operatingprofitgrowthrate) values(17, 2020, 902809, 1902106, -110454, -0.1878, 0.0392, "ÀûÀÚÀüÈ¯" );
 
 
 insert into current_situation(brand_id, opening_date, NumberOfFranchises, NumberOfEmployees, Scheduled_To_Open, Scheduled_To_Close, Contract_Termination, Transfer, AverageSales, Average_Sales_per_Area) values(1, "2001-08-17", 2651, 407, 302, 0, 50, 213, 216931, 8415 );
@@ -291,51 +426,51 @@ insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, ex
 insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(21, 5500, 5500, 2000, 59213, 5921, 33 ); 
 insert into opening_cost(brand_id, subscript_fee, education_fee, deposit_fee, extra_fee, cost_per_area, standard_area) values(22, 7700, 3300, 10000, 156051, 2983, 99 ); 
 
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(1, 1, 6, "ë¡¤ì¼€ì´í¬ë§› ì¿ í‚¤", "1"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(2, 1, 3, "ë¯¼íŠ¸ì´ˆì½” ì¿ í‚¤", "2"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(3, 1, 5, "ë§ˆë²•ì‚¬ë§› ì¿ í‚¤", "3"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(4, 2, 6, "ë½ìŠ¤íƒ€ë§› ì¿ í‚¤", "4"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(5, 1, 3, "í™ê³ ì¶”ë§› ì¿ í‚¤", "5"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(6, 2, 1, "ë¸”ë™ë² ë¦¬ë§› ì¿ í‚¤", "6"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(7, 1, 3, "êµ¬ë¯¸í˜¸ë§› ì¿ í‚¤", "7"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(8, 2, 1, "ì›¨ì–´ìš¸í”„ë§› ì¿ í‚¤", "8"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(9, 2, 1, "ë¼ì„ë§› ì¿ í‚¤", "9"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(10, 1, 6, "ì²´ë¦¬ë§› ì¿ í‚¤", "10"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(11, 1, 6, "ëˆˆì„¤íƒ•ë§› ì¿ í‚¤" ,"11" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(12, 2, 7, "íŒ¬ì¼€ì´í¬ë§› ì¿ í‚¤", "12"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(13, 2, 5, "ë‹¬í† ë¼ë§› ì¿ í‚¤" ,"13" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(14, 1, 7, "ì‹œë‚˜ëª¬ë§› ì¿ í‚¤", "14"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(15, 1, 3, "ì½”ì½”ì•„ë§› ì¿ í‚¤", "15"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(16, 2, 5, "ì¹˜ì–´ë¦¬ë”ë§› ì¿ í‚¤", "16"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(17, 1, 6, "í•‘í¬ì´ˆì½”ì¿ í‚¤", "17"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(18, 2, 7, "í—ˆë¸Œë§› ì¿ í‚¤", "18"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(19, 1, 2, "ì²œì‚¬ë§› ì¿ í‚¤","19"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(20, 1, 6, "ë°•í•˜ì‚¬íƒ•ë§› ì¿ í‚¤","20"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password)values(21, 1, 6, "ëŒ€ì¶”ë§› ì¿ í‚¤","21"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(22, 1, 2, "ë ˆëª¬ë§› ì¿ í‚¤","22"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(23, 2, 6, "ë°”ë‚˜ë‚˜ë§› ì¿ í‚¤","23"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(24, 2, 7, "í”¼ìŠ¤íƒ€ì¹˜ì˜¤ë§› ì¿ í‚¤","24"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(25, 1, 2, "ë‹Œìë§› ì¿ í‚¤" ,"25" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(26, 2, 5, "ìŠˆí¬ë¦¼ë§› ì¿ í‚¤","26"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(27, 2, 5, "ì˜ì ë§› ì¿ í‚¤" ,"27" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(28, 1, 3, "í™”ì´íŠ¸ì´ˆì½” ì¿ í‚¤" ,"28" );
-insert into customer(customer_id, sex_id, age_id, nickname, password)values(29, 2, 5, "í”¼ê²¨ì—¬ì™•ë§› ì¿ í‚¤" ,"29" );
-insert into customer(customer_id, sex_id, age_id, nickname, password)values(30, 2, 2, "ì•…ë§ˆë§› ì¿ í‚¤", "30"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(31, 1, 1, "ì†Œë‹¤ë§› ì¿ í‚¤", "31" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(32, 1, 1, "ë¼ì¦ˆë² ë¦¬ë§› ì¿ í‚¤", "32" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(33, 1, 1, "ë¸”ë£¨íŒŒì´ë§› ì¿ í‚¤", "33" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(34, 1, 1, "ì¹˜ì•½ë§› ì¿ í‚¤", "34" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(35, 1, 4, "ìëª½ë§› ì¿ í‚¤", "35" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(36, 1, 4, "ì¹˜í‚¨ë§› ì¿ í‚¤", "36"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(37, 1, 4, "í”¼ìë§› ì¿ í‚¤", "37"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(38, 1, 4, "ë¸”ë™ì»¤ëŸ°íŠ¸ë§› ì¿ í‚¤", "38"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(39, 2, 3, "ë¸”ë£¨ë² ë¦¬ë§› ì¿ í‚¤", "39"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(40, 2, 3, "ë°€í¬ì´ˆì½”ë§› ì¿ í‚¤", "40"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(41, 2, 3, "ì—ì¼ë¦¬ì–¸ ì¿ í‚¤", "41"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(42, 2, 3, "ë¬´í™”ê³¼ë§› ì¿ í‚¤", "42"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(43, 2, 4, "ë©”ë¡ ë§› ì¿ í‚¤", "43"  );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(44, 2, 4, "ìˆ˜ë°•ë§› ì¿ í‚¤" , "44" );
-insert into customer(customer_id, sex_id, age_id, nickname, password) values(45, 2, 4, "í•œë¼ë´‰ë§› ì¿ í‚¤", "45" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(1, 1, 6, "·ÑÄÉÀÌÅ©¸À ÄíÅ°", "1"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(2, 1, 3, "¹ÎÆ®ÃÊÄÚ ÄíÅ°", "2"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(3, 1, 5, "¸¶¹ı»ç¸À ÄíÅ°", "3"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(4, 2, 6, "¶ô½ºÅ¸¸À ÄíÅ°", "4"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(5, 1, 3, "È«°íÃß¸À ÄíÅ°", "5"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(6, 2, 1, "ºí·¢º£¸®¸À ÄíÅ°", "6"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(7, 1, 3, "±¸¹ÌÈ£¸À ÄíÅ°", "7"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(8, 2, 1, "¿ş¾î¿ïÇÁ¸À ÄíÅ°", "8"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(9, 2, 1, "¶óÀÓ¸À ÄíÅ°", "9"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(10, 1, 6, "Ã¼¸®¸À ÄíÅ°", "10"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(11, 1, 6, "´«¼³ÅÁ¸À ÄíÅ°" ,"11" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(12, 2, 7, "ÆÒÄÉÀÌÅ©¸À ÄíÅ°", "12"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(13, 2, 5, "´ŞÅä³¢¸À ÄíÅ°" ,"13" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(14, 1, 7, "½Ã³ª¸ó¸À ÄíÅ°", "14"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(15, 1, 3, "ÄÚÄÚ¾Æ¸À ÄíÅ°", "15"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(16, 2, 5, "Ä¡¾î¸®´õ¸À ÄíÅ°", "16"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(17, 1, 6, "ÇÎÅ©ÃÊÄÚÄíÅ°", "17"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(18, 2, 7, "Çãºê¸À ÄíÅ°", "18"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(19, 1, 2, "Ãµ»ç¸À ÄíÅ°","19"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(20, 1, 6, "¹ÚÇÏ»çÅÁ¸À ÄíÅ°","20"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password)values(21, 1, 6, "´ëÃß¸À ÄíÅ°","21"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(22, 1, 2, "·¹¸ó¸À ÄíÅ°","22"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(23, 2, 6, "¹Ù³ª³ª¸À ÄíÅ°","23"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(24, 2, 7, "ÇÇ½ºÅ¸Ä¡¿À¸À ÄíÅ°","24"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(25, 1, 2, "´ÑÀÚ¸À ÄíÅ°" ,"25" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(26, 2, 5, "½´Å©¸²¸À ÄíÅ°","26"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(27, 2, 5, "ÀÇÀû¸À ÄíÅ°" ,"27" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(28, 1, 3, "È­ÀÌÆ®ÃÊÄÚ ÄíÅ°" ,"28" );
+insert into customer(customer_id, sex_id, age_id, nickname, password)values(29, 2, 5, "ÇÇ°Ü¿©¿Õ¸À ÄíÅ°" ,"29" );
+insert into customer(customer_id, sex_id, age_id, nickname, password)values(30, 2, 2, "¾Ç¸¶¸À ÄíÅ°", "30"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(31, 1, 1, "¼Ò´Ù¸À ÄíÅ°", "31" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(32, 1, 1, "¶óÁîº£¸®¸À ÄíÅ°", "32" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(33, 1, 1, "ºí·çÆÄÀÌ¸À ÄíÅ°", "33" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(34, 1, 1, "Ä¡¾à¸À ÄíÅ°", "34" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(35, 1, 4, "ÀÚ¸ù¸À ÄíÅ°", "35" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(36, 1, 4, "Ä¡Å²¸À ÄíÅ°", "36"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(37, 1, 4, "ÇÇÀÚ¸À ÄíÅ°", "37"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(38, 1, 4, "ºí·¢Ä¿·±Æ®¸À ÄíÅ°", "38"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(39, 2, 3, "ºí·çº£¸®¸À ÄíÅ°", "39"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(40, 2, 3, "¹ĞÅ©ÃÊÄÚ¸À ÄíÅ°", "40"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(41, 2, 3, "¿¡ÀÏ¸®¾ğ ÄíÅ°", "41"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(42, 2, 3, "¹«È­°ú¸À ÄíÅ°", "42"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(43, 2, 4, "¸Ş·Ğ¸À ÄíÅ°", "43"  );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(44, 2, 4, "¼ö¹Ú¸À ÄíÅ°" , "44" );
+insert into customer(customer_id, sex_id, age_id, nickname, password) values(45, 2, 4, "ÇÑ¶óºÀ¸À ÄíÅ°", "45" );
 
 insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(01, 1, 2, 1, 3, 5, 5, 3, 2 );
 insert into rate(customer_id, brand_id, staff_service, accessibility,convenience, taste_menu, price, additional_service, service_favorability) values(01, 7, 5, 4, 3, 5, 1, 5, 2 );
